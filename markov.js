@@ -7,7 +7,7 @@ class MarkovMachine {
 
   constructor(text) {
     let words = text.split(/[ \r\n]+/);
-    let chains = makeChains(words);
+    this.chains = this.makeChains(words);
   }
 
   /** set markov chains:
@@ -19,14 +19,10 @@ class MarkovMachine {
     let chains = {};
 
     for (let i = 0; i < words.length; i++) {
-      console.log(words[i])
       if (words[i] in chains) {
-        console.log('in if', words[i])
         chains[words[i]].push(words[i+1] || null);
       } else {
-        console.log('in else', words[i])
         chains[words[i]] = [words[i+1] || null];
-        console.log('chains obj', chains)
       }
     }
 
@@ -37,24 +33,27 @@ class MarkovMachine {
   /** return random text from chains */
 
   getText(numWords = 100) {
-    let textLength = 0;
-    let currWord = 'the';
-    while (textLength <= numWords) {
-      'cat in the hat '
-      
-      textLength++;
+    let textArray = [];
+    let keys = Object.keys(this.chains)
+    let currWord = this.chooseRandom(keys);
+    while (textArray.length < numWords) {
+      if(currWord === null) {
+        currWord = this.chooseRandom(keys);
+      } else {
+        textArray.push(currWord);
+        currWord = this.chooseRandom(this.chains[currWord]);
+      }
     }
+    return textArray.join(' ');
   }
 
-  chooseNext(currWord) {
-    if (chains[currWord]) {
-      // randomize later
-      currWord = chains[currWord][0];
-    } 
+  chooseRandom(arr) {
+    let randIdx = Math.floor(Math.random() * arr.length)
+    return arr[randIdx];
   }
 }
 
-let markovtest = new MarkovMachine('hi');
-console.log(markovtest.makeChains(['the', 'cat', 'in', 'the', 'hat']))
+let markovtest = new MarkovMachine('the cat in the hat');
+// console.log(markovtest.getText(20))
 
 module.exports = { MarkovMachine };
